@@ -8,7 +8,7 @@ from datetime import *
 import mysql.connector as myConnector 
 from mysql.connector import Error 
 from tkinterMyProjUtilities import * 
-
+import tkinter.font as tkfont
 
 def frmRefresh():
 	userIdIntVar.set(0) 
@@ -197,91 +197,107 @@ def sel(rdBtnInt):
 		btnPickOutDate.configure(state = DISABLED)
 		btnPickInDate.configure(state = NORMAL)
 
+def getStringLen(strText, lblFont):
+	#fontUID = tkfont.Font(family="Arial", size=12, weight="normal")
+	strLen_px = lblFont.measure(strText)
+	scrWidth_px=root.winfo_screenwidth()
+	scrWidth_in=13.5
+	m_len_in=strLen_px * scrWidth_in / scrWidth_px
+	return m_len_in
+
+
 def borrowRetWin(root): 
-	global userIdIntVar
-	global bookISBNStrVar 
-	global lblBookTitleStrVar 
-	global lblUserNameStrVar
-	global outDateStrVar 
+
+	global userIdIntVar ;userIdIntVar = IntVar()
+	global bookISBNStrVar; bookISBNStrVar = StringVar()
+	global lblBookTitleStrVar; lblBookTitleStrVar = StringVar()  
+	global lblUserNameStrVar ;lblUserNameStrVar = StringVar() 
+	global outDateStrVar; outDateStrVar = StringVar() 
 	global btnPickOutDate
-	global inDateStrVar
+	global inDateStrVar; inDateStrVar = StringVar() 
 	global btnPickInDate
-	global rdBtnInt
+	global rdBtnInt; rdBtnInt = IntVar() 
 	global myDb, user, passW
 
+	lblFont = tkfont.Font(family="Arial", size=14, weight="normal")
+	nPadX=0 ; nPady=0 ; cSticky = 'w'
+	nGetBtnWidth = 8 ;nEntryWidth=24
+	
 	borRetWin = Toplevel(root) 
 	borRetWin.title("Borrow and return window") 
 #END PAGE 228
-	winSizeAndPos(borRetWin, 700, 800) 
+	winSizeAndPos(borRetWin, 600, 650) 
 	borRetWin.configure(bg = '#BDBDBD') 
 	btnConfig() 
-	lblTitle = Label(borRetWin, text = "Borrow And Return Books Form", font = ('bold'))
-	lblTitle.grid(pady = 10, row = 0, columnspan = 3, sticky = N ) 
-	#lblUId = Label(borRetWin, text = "Enter user library Id", font = ('bold'), width = 18)
-	lblUId = Label(borRetWin, text = "Enter user library Id", font = ("normal"),width=15)
-	lblUId.grid(padx = 5, pady = 5, row = 1, column = 0, sticky = W) 
-
- 
-	userIdIntVar = IntVar()
-	txtUserId = Entry(borRetWin, textvariable = userIdIntVar, width = 24, font = ('bold'))
-	txtUserId.grid(padx = 3, pady = 5, row = 1, column = 1, sticky = W) 
+	lblTitle = Label(borRetWin, text = "Borrow And Return Books Form", font =lblFont)
+	lblTitle.grid(pady = nPadX, row = 0, columnspan = 3, sticky = N ) 
+	
+	#USER ID LABEL & ENTRY
+	strLabelText="Enter user library Id"
+	lblWidth=getStringLen(strLabelText, lblFont)
+	lblUId = Label(borRetWin, text = strLabelText, font =lblFont, width=lblWidth+1)
+	lblUId.grid(padx = nPadX, pady = nPady, row = 1, column = 0, sticky = cSticky)
+	txtUserId = Entry(borRetWin, textvariable = userIdIntVar, width = nEntryWidth, font = ('bold'))
+	txtUserId.grid(padx = nPadX, pady = nPady, row = 1, column = 1, sticky = cSticky) 
 	txtUserId.focus() 
 
-	btnGetUser = Button(borRetWin, text = "Get User", width = 8, command = getUserInf)
-	btnGetUser.grid(pady = 5, row = 1, column = 2, sticky = W) 
-	lblUN = Label(borRetWin, text = "Library user name", width = 15, font = ('bold')) 
-	lblUN.grid(padx = 3, pady = 5, row = 2, column = 0, sticky = W) 
+	#USER ID BUTTON
+	btnGetUser = Button(borRetWin, text = "Get User", width = nGetBtnWidth, command = getUserInf)
+	btnGetUser.grid(pady = nPadX, row = 1, column = 2, sticky = cSticky) 
 
-	lblUserNameStrVar = StringVar() 
-	lblUserName = Label(borRetWin, textvariable = lblUserNameStrVar, width = 24, font = ('bold'))
+	#USER NAME LABELS (2 LABELS, NO ENTRY)
+	strLabelText="Library user name"
+	lblWidth=getStringLen(strLabelText,lblFont)
+	lblUN = Label(borRetWin, text = strLabelText, width = lblWidth+1, font = lblFont) 
+	lblUN.grid(padx = nPadX, pady = nPady, row = 2, column = 0, sticky = cSticky) 
+	lblUserName = Label(borRetWin, textvariable = lblUserNameStrVar, width = nEntryWidth, font = ('bold'))
 #END PAGE 229
-	lblUserName.grid(padx = 3, pady = 5, row = 2, column = 1, sticky = W) 
-	lblISBN = Label(borRetWin, text = "Enter/Scan ISBN", font = ('bold'), width = 15) 
-	lblISBN.grid(padx = 5, pady = 5, row = 3, column = 0, sticky = W) 
+	lblUserName.grid(padx = nPadX, pady = nPady, row = 2, column = 1, sticky = W)
 
-	
-	bookISBNStrVar = StringVar() 
-	txtBookISBN = Entry(borRetWin, textvariable = bookISBNStrVar, width = 24, font = ('bold'))
-	txtBookISBN.grid(padx = 3, pady = 5, row = 3, column = 1, sticky = W) 
-	btnGetBook = Button(borRetWin, text = "Get Book", width = 8, command = getBookInf)
-	btnGetBook.grid(pady = 5, row = 3, column = 2, sticky = W) 
-	lblBT = Label(borRetWin, text = "Library book title", width = 15, font = ('bold')) 
-	lblBT.grid(padx = 3, pady = 5, row = 4, column = 0, sticky = W) 
-	
-	
-	lblBookTitleStrVar = StringVar() 
-	lblBookTitle = Label(borRetWin, textvariable = lblBookTitleStrVar, width = 24, font = ('bold')) 
-	lblBookTitle.grid(padx = 3, pady = 5, row = 4, column = 1, sticky = W) 
-	lblOut = Label(borRetWin, text = "Borrow date", width = 15, font = ('bold')) 
-	lblOut.grid(padx = 3, pady = 5, row = 5, column = 0, sticky = W) 
+	#ISBN LABEL, ENTRY & BUTTON
+	strLabelText="Enter/Scan ISBN"
+	lblWidth=getStringLen(strLabelText,lblFont)
+	lblISBN = Label(borRetWin, text = strLabelText, font = lblFont, width = lblWidth) 
+	lblISBN.grid(padx = nPadX, pady = nPady, row = 3, column = 0, sticky = cSticky) 
+	txtBookISBN = Entry(borRetWin, textvariable = bookISBNStrVar, width = nEntryWidth, font = ('bold'))
+	txtBookISBN.grid(padx = nPadX, pady = nPady, row = 3, column = 1, sticky = cSticky) 
+	btnGetBook = Button(borRetWin, text = "Get Book", width = nGetBtnWidth, command = getBookInf)
+	btnGetBook.grid(pady = nPadX, row = 3, column = 2, sticky = cSticky)
 
+	#BOOK TITLE LABELS (2, NO ENTRY)
+	strLabelText="Library book title"
+	lblWidth=getStringLen(strLabelText, lblFont)
+	lblBT = Label(borRetWin, text =strLabelText, width = lblWidth+1, font = lblFont) 
+	lblBT.grid(padx = nPadX, pady = nPady, row = 4, column = 0, sticky= cSticky) 
+	lblBookTitle = Label(borRetWin, textvariable = lblBookTitleStrVar, width = nEntryWidth, font = ('bold')) 
+	lblBookTitle.grid(padx = nPadX, pady = nPady, row = 4, column = 1, sticky = cSticky) 
 	
-	outDateStrVar = StringVar() 
-	lblOutDate = Label(borRetWin, textvariable = outDateStrVar, width = 24, font = ('bold'))
-	lblOutDate.grid(padx = 3, pady = 5, row = 5, column = 1, sticky = W) 
-
-	
+	#BORROW DATE (2 LABELs & BUTTON)
+	strLabelText="Borrow date"
+	lblWidth=getStringLen (strLabelText,lblFont)
+	lblOut = Label(borRetWin, text = strLabelText, width = lblWidth+1, font = lblFont) 
+	lblOut.grid(padx = nPadX, pady = nPady, row = 5, column = 0, sticky = cSticky) 
+	lblOutDate = Label(borRetWin, textvariable = outDateStrVar, width = nEntryWidth, font = ('bold'))
+	lblOutDate.grid(padx = nPadX, pady = nPady, row = 5, column = 1, sticky = cSticky) 
 #END PAGE 230
-	btnPickOutDate = Button(borRetWin, text = "Get Date", width = 8, state = DISABLED, command = lambda: outDate(cal))
-	btnPickOutDate.grid(pady = 5, row = 5, column = 2, sticky = W) 
-	lblIn = Label(borRetWin, text = "Return date", width = 15, font = ('bold')) 
-	lblIn.grid(padx = 3, pady = 5, row = 6, column = 0, sticky = W) 
+	btnPickOutDate = Button(borRetWin, text = "Get Date", width = nGetBtnWidth, state = DISABLED, command = lambda: outDate(cal))
+	btnPickOutDate.grid(pady = nPady, row = 5, column = 2, sticky = cSticky)
 
- 
-	inDateStrVar = StringVar() 
-	lblInDate = Label(borRetWin, textvariable = inDateStrVar, width = 24, font = ('bold'))
-	lblInDate.grid(padx = 3, pady = 5, row = 6, column = 1, sticky = W) 
-
-	 
-	btnPickInDate = Button(borRetWin, text = "Get Date", width = 8, state = DISABLED, command = lambda: inDate(cal)) 
-	btnPickInDate.grid(pady = 5, row = 6, column = 2, sticky = W) 
+	#RETURN DATE (2 LABELS & BUTTON)
+	strLabelText="Return date"
+	lblWidth=getStringLen(strLabelText,lblFont) 
+	lblIn = Label(borRetWin, text =strLabelText, width = lblWidth+1, font = lblFont) 
+	lblIn.grid(padx = nPadX, pady = nPady, row = 6, column = 0, sticky = cSticky) 
+	lblInDate = Label(borRetWin, textvariable = inDateStrVar, width = nEntryWidth, font = ('bold'))
+	lblInDate.grid(padx = nPadX, pady = nPady, row = 6, column = 1, sticky = cSticky) 
+	btnPickInDate = Button(borRetWin, text = "Get Date", width = nGetBtnWidth, state = DISABLED, command = lambda: inDate(cal)) 
+	btnPickInDate.grid(pady = nPadX, row = 6, column = 2, sticky = cSticky) 
+	
 	#LabelFrame    
-
 	lblFrame = LabelFrame(borRetWin, text = 'Borrow Mode', width = 25) 
-	lblFrame.grid(padx = 25, pady = 5, row = 7, columnspan = 3, sticky = W) 
-
-	 
-	rdBtnInt = IntVar() 
+	lblFrame.grid(padx = 25, pady = nPady, row = 7, columnspan = 3, sticky = cSticky) 
+	
+	#RADIO BUTTONS
 	rdBtnRenew = Radiobutton(lblFrame, text = "Renew", variable = rdBtnInt, value = 1, command = lambda: sel(rdBtnInt)) 
 	rdBtnRenew.pack(side = LEFT, padx = 7) 
 	rdBtnBorrow = Radiobutton(lblFrame, text = "Borrow", variable = rdBtnInt, value = 2, command = lambda: sel(rdBtnInt)) 
@@ -289,6 +305,7 @@ def borrowRetWin(root):
 #END PAGE 231
 	rdBtnReturn = Radiobutton(lblFrame, text = "Return", variable = rdBtnInt, value = 3, command = lambda: sel(rdBtnInt)) 
 	rdBtnReturn.pack(side = LEFT, padx = 7) 
+
 	# Create save button photoimage object img1 
 	imagem="C:\\_DATA\Bitmaps\\floppy.png"
 	img1 = PhotoImage(file = imagem)
@@ -299,12 +316,14 @@ def borrowRetWin(root):
 	img2 = PhotoImage(file = imagem2) 
 	btnBack = Button(borRetWin, text = "Back", width = 10, image = img2, command = lambda : showAndDestroy(root, borRetWin)) 
 	btnBack.grid(pady = 5, row = 8, column = 1) 
+
+	#CALENDAR
 	x = datetime.now() 
 	thisYear = x.strftime("%Y") 
 	cal = Calendar(borRetWin, selectmode = "day", year = int(thisYear), month = x.month, day = x.day)
 	cal.grid(padx = 25, pady = 5, row = 9, columnspan = 3, sticky = W)
 	
-	# Display untill closed manually. 
+	# Display until closed manually. 
 	
 	hide (root) 
 	borRetWin.takefocus = True 
