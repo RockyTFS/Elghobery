@@ -132,8 +132,9 @@ def saveData():
 	borrowedOn is NOT NULL and returnedOn is NULL return give a message
 	"""
 
+
 	mySqlStr = f"SELECT userId, bookISBN, borrowedOn, returnedOn FROM " + \
-			"borrow WHERE userId = {userId} AND bookISBN =  {bookISBN}"
+			f"borrow WHERE userId = {userId} AND bookISBN = {bookISBN}"
 	try: 
 		myDbConn = myConnector.connect(
 			host='localhost', database = f"{myDb}", 
